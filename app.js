@@ -12,7 +12,6 @@ const session = require('express-session');
 const flash = require('connect-flash');
 const passport = require('passport');
 const localStrategy = require('passport-local');
-//const initializePassport = require('./passport-config');
 const mongoSanitize = require('express-mongo-sanitize');
 app.use(mongoSanitize());
   
@@ -53,19 +52,16 @@ const sessionConfig = {
     saveUninitialized: true,
     cookie: {
         secure: false,
-        //secure:true fungsinya agar cookie kita hnya accessible dalam secured connections (https)
         httpOnly: true,
         expires: Date.now() + 1000 * 60 * 60 * 24 * 7,
         maxAge: 1000 * 60 * 60 * 24 * 7
     }
-    //NOTE: MASIH MENGGUNAKAN LOCAL MEMORY
 }
 app.use(session(sessionConfig));
 
 app.use(flash());
 
 //PASSPORT SETUP
-//initializePassport(passport);
 app.use(passport.initialize());
 app.use(passport.session());
 passport.use(new localStrategy(User.authenticate()));
@@ -76,16 +72,8 @@ app.use((req, res, next) => {
     res.locals.currentUser = req.user;
     res.locals.success = req.flash('success');
     res.locals.error = req.flash('error');
-    //res.locals.success artinya success dapat diakses di folder views kapanpun.
     next();
 })
-
-
-/* 
-NOTE: DALAM ASYNC FUNCTION, KETIKA ERROR DI THROW, ERROR TSBT TIDAK AKAN DI CATCH 
-DIMANAPUN.
-MAKANYA, KALO DI ASYNC FUNCTION, PAKE NEXT(ERROR), BUKAN THROW NEW ERROR.
-*/
 
 app.get('/', (req, res) => {
     res.render('home');
